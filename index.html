@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     
                 } catch (error) {
                     console.error('Signup error:', error);
-                    alert('Erro ao criar conta: ' + (error.message || 'Tente novamente.'));
+                    if (error.message.includes('security') || error.message.includes('rate limit')) { alert('Aguarde alguns segundos e tente novamente. (Proteção anti-spam)'); } else if (error.message.includes('already registered')) { alert('Este email já está cadastrado. Tente fazer login.'); } else { alert('Erro: ' + error.message); }
                 }
             }
         }, true);
