@@ -183,14 +183,57 @@ document.addEventListener('DOMContentLoaded', async function() {
 </body>
 </html>
 <script>
+// Suppress ResizeObserver errors
+(function() {
+    const ro = window.onerror;
+    window.onerror = function(msg) {
+        if (msg && msg.toString().includes('ResizeObserver')) return true;
+        return ro ? ro.apply(this, arguments) : false;
+    };
+    window.addEventListener('error', function(e) {
+        if (e.message && e.message.includes('ResizeObserver')) {
+            e.stopPropagation();
+            e.preventDefault();
+            return true;
+        }
+    }, true);
+    
+    // Also suppress from bundle error display
+    const origAddEventListener = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function(type, listener, options) {
+        if (type === 'error' && this === window) {
+            const wrappedListener = function(e) {
+                if (e.message && e.message.includes('ResizeObserver')) {
+                    return true;
+                }
+                return listener.apply(this, arguments);
+            };
+            return origAddEventListener.call(this, type, wrappedListener, options);
+        }
+        return origAddEventListener.call(this, type, listener, options);
+    };
+})();
+
 // Supabase Integration for USMLE Daily Tracker Signup
 (function() {
     const SUPABASE_URL = 'https://wdkotckjvkctxvaewfyw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka290Y2tqdmtjdHh2YWV3Znl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwODIxOTYsImV4cCI6MjA3OTY1ODE5Nn0.BQf0O1qmJSH0AHjwIDDSKTbU2LBaQtIpTkBEjfCzg7Y';
     const REDIRECT_URL = 'https://usmle-daily-study-tracker.vercel.app/';
 
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function validatePassword(password) {
+        return password && password.length >= 6;
+    }
+
+    function showError(message) {
+        alert(message);
+    }
+
     function showSuccessAndRedirect() {
-        // Create overlay
         const overlay = document.createElement('div');
         overlay.style.cssText = 'position:fixed;inset:0;background:rgba(17,10,9,0.95);display:flex;align-items:center;justify-content:center;z-index:99999;';
         
@@ -213,7 +256,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         overlay.appendChild(content);
         document.body.appendChild(overlay);
         
-        // Countdown
         let seconds = 5;
         const countdownEl = document.getElementById('countdown');
         const timer = setInterval(() => {
@@ -253,7 +295,32 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const password = passwordInput.value;
                 const name = nameInput ? nameInput.value.trim() : '';
 
-                // Show loading state
+                // Validate email
+                if (!email) {
+                    showError('Por favor, insira seu email.');
+                    emailInput.focus();
+                    return;
+                }
+                
+                if (!validateEmail(email)) {
+                    showError('Por favor, insira um email válido.');
+                    emailInput.focus();
+                    return;
+                }
+
+                // Validate password
+                if (!password) {
+                    showError('Por favor, insira uma senha.');
+                    passwordInput.focus();
+                    return;
+                }
+                
+                if (!validatePassword(password)) {
+                    showError('A senha deve ter no mínimo 6 caracteres.');
+                    passwordInput.focus();
+                    return;
+                }
+
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const originalText = submitBtn ? submitBtn.textContent : '';
                 if (submitBtn) {
@@ -273,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     if (error) throw error;
 
                     if (data.user && data.user.identities && data.user.identities.length === 0) {
-                        alert('Este email já está cadastrado. Tente fazer login na plataforma.');
+                        showError('Este email já está cadastrado. Tente fazer login na plataforma.');
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.textContent = originalText;
@@ -281,7 +348,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                         return;
                     }
 
-                    // Success - show overlay with countdown
                     showSuccessAndRedirect();
                     
                 } catch (error) {
@@ -289,8 +355,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                     let errorMsg = error.message || 'Tente novamente.';
                     if (errorMsg.includes('rate limit')) {
                         errorMsg = 'Muitas tentativas. Aguarde alguns minutos.';
+                    } else if (errorMsg.includes('password')) {
+                        errorMsg = 'Senha inválida. Use no mínimo 6 caracteres.';
+                    } else if (errorMsg.includes('email')) {
+                        errorMsg = 'Email inválido ou já cadastrado.';
                     }
-                    alert('Erro ao criar conta: ' + errorMsg);
+                    showError('Erro: ' + errorMsg);
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.textContent = originalText;
