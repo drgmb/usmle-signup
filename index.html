@@ -189,7 +189,43 @@ document.addEventListener('DOMContentLoaded', async function() {
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka290Y2tqdmtjdHh2YWV3Znl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwODIxOTYsImV4cCI6MjA3OTY1ODE5Nn0.BQf0O1qmJSH0AHjwIDDSKTbU2LBaQtIpTkBEjfCzg7Y';
     const REDIRECT_URL = 'https://usmle-daily-study-tracker.vercel.app/';
 
-    // Wait for Supabase to load
+    function showSuccessAndRedirect() {
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(17,10,9,0.95);display:flex;align-items:center;justify-content:center;z-index:99999;';
+        
+        const content = document.createElement('div');
+        content.style.cssText = 'text-align:center;color:#F4E8D3;font-family:Georgia,serif;padding:40px;';
+        content.innerHTML = `
+            <div style="width:80px;height:80px;border-radius:50%;background:#22c55e;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">
+                <svg width="40" height="40" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h2 style="font-size:28px;margin-bottom:12px;color:#F4E8D3;">Conta criada com sucesso!</h2>
+            <p style="font-size:18px;color:#D4A05A;margin-bottom:24px;">Seus dados foram recebidos.</p>
+            <p style="font-size:16px;color:#999;">Redirecionando para a plataforma em <span id="countdown" style="color:#F4E8D3;font-weight:bold;">5</span> segundos...</p>
+            <div style="margin-top:20px;">
+                <a href="${REDIRECT_URL}" style="color:#D4A05A;text-decoration:underline;">Ir agora</a>
+            </div>
+        `;
+        
+        overlay.appendChild(content);
+        document.body.appendChild(overlay);
+        
+        // Countdown
+        let seconds = 5;
+        const countdownEl = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            seconds--;
+            if (countdownEl) countdownEl.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                window.location.href = REDIRECT_URL;
+            }
+        }, 1000);
+    }
+
     function initSupabase() {
         if (typeof supabase === 'undefined') {
             setTimeout(initSupabase, 100);
@@ -198,11 +234,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         const authClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         window.__supabaseAuth = authClient;
-
-        // Override form submission
-        const originalSubmit = window.__originalFormSubmit;
         
-        // Intercept form submissions
         document.addEventListener('submit', async function(e) {
             const form = e.target;
             if (form.id === 'cadastro' || form.closest('#cadastro')) {
@@ -221,12 +253,19 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const password = passwordInput.value;
                 const name = nameInput ? nameInput.value.trim() : '';
 
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn ? submitBtn.textContent : '';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Criando conta...';
+                }
+
                 try {
                     const { data, error } = await authClient.auth.signUp({
                         email: email,
                         password: password,
                         options: {
-                            emailRedirectTo: REDIRECT_URL,
                             data: { full_name: name }
                         }
                     });
@@ -234,22 +273,33 @@ document.addEventListener('DOMContentLoaded', async function() {
                     if (error) throw error;
 
                     if (data.user && data.user.identities && data.user.identities.length === 0) {
-                        alert('Este email já está cadastrado. Tente fazer login.');
+                        alert('Este email já está cadastrado. Tente fazer login na plataforma.');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalText;
+                        }
                         return;
                     }
 
-                    // Success - the React component should handle the UI update
-                    console.log('Signup successful:', data);
+                    // Success - show overlay with countdown
+                    showSuccessAndRedirect();
                     
                 } catch (error) {
                     console.error('Signup error:', error);
-                    alert('Erro ao criar conta: ' + (error.message || 'Tente novamente.'));
+                    let errorMsg = error.message || 'Tente novamente.';
+                    if (errorMsg.includes('rate limit')) {
+                        errorMsg = 'Muitas tentativas. Aguarde alguns minutos.';
+                    }
+                    alert('Erro ao criar conta: ' + errorMsg);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
                 }
             }
         }, true);
     }
 
-    // Start initialization
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initSupabase);
     } else {
