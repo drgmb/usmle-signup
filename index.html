@@ -42,7 +42,7 @@
         }
     </script>
 
-    <!-- Supabase -->
+    <!-- Auth SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -366,13 +366,13 @@
     </div>
 
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://wdkotckjvkctxvaewfyw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka290Y2tqdmtjdHh2YWV3Znl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwODIxOTYsImV4cCI6MjA3OTY1ODE5Nn0.BQf0O1qmJSH0AHjwIDDSKTbU2LBaQtIpTkBEjfCzg7Y';
+        // API Configuration
+        const API_URL = 'https://wdkotckjvkctxvaewfyw.supabase.co';
+        const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka290Y2tqdmtjdHh2YWV3Znl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwODIxOTYsImV4cCI6MjA3OTY1ODE5Nn0.BQf0O1qmJSH0AHjwIDDSKTbU2LBaQtIpTkBEjfCzg7Y';
         const REDIRECT_URL = 'https://drgmb.github.io/usmle-daily-study-tracker/';
 
-        // Initialize Supabase client
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Initialize auth client
+        const authClient = supabase.createClient(API_URL, API_KEY);
 
         // DOM Elements
         const form = document.getElementById('signupForm');
@@ -563,7 +563,7 @@
             btnSpinner.classList.remove('hidden');
 
             try {
-                const { data, error } = await supabaseClient.auth.signUp({
+                const { data, error } = await authClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {

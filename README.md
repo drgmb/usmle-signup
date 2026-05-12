@@ -17,7 +17,6 @@ Página de cadastro para o [USMLE Study Tracker](https://drgmb.github.io/usmle-d
 - HTML5
 - Tailwind CSS (via CDN)
 - JavaScript (ES6+)
-- Supabase Auth
 
 ## Deploy
 
