@@ -3,162 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#f5f5f7">
-    <meta name="description" content="Crie sua conta no USMLE Study Tracker - Rastreie seu progresso nos estudos para o USMLE">
-    <title>Criar Conta - USMLE Study Tracker</title>
+    <meta name="theme-color" content="#110A09">
+    <meta name="description" content="Crie sua conta no USMLE Daily Study Tracker - Acompanhe sua jornada até o Step">
+    <title>Criar Conta - USMLE Daily Tracker</title>
 
     <!-- Preconnect for faster font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Fonts: Geist + Instrument Serif -->
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
     <!-- Auth SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg: #110A09;
+            --bg-2: #160E0D;
+            --surface: #1A1310;
+            --surface-2: #221813;
+            --ink: #F4E8D3;
+            --ink-2: #DBC9AA;
+            --muted: #998B72;
+            --muted-2: #6E624F;
+            --line: rgba(244,232,211,.07);
+            --line-2: rgba(244,232,211,.14);
+            --red: #D14B5C;
+            --red-2: #E37685;
+            --red-glow: #B23A48;
+            --red-deep: #8C2A38;
+            --gold: #D4A05A;
+            --gold-glow: #A07835;
+            --gold-2: #E8C988;
+            --coral: #FF7A65;
+            --cream: #F4E8D3;
+        }
+
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        html, body {
+            background: var(--bg);
             min-height: 100vh;
         }
 
+        body {
+            color: var(--ink);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .serif {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+        }
+
+        ::selection {
+            background: var(--red-glow);
+            color: #fff;
+        }
+
+        /* Ambient blobs */
+        .blob {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.35;
+            z-index: 0;
+        }
+
+        /* Grid background */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(to right, rgba(255,255,255,.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,.04) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 70%);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-deep) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px -8px rgba(178,58,72,0.5), 0 0 0 1px rgba(244,232,211,.06);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--ink);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Card */
         .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid var(--line);
+            box-shadow: 0 30px 60px -30px rgba(0,0,0,.7), 0 0 0 1px rgba(209,75,92,.08);
         }
 
-        .input-field {
-            transition: all 0.2s ease;
-            border: 2px solid #e5e7eb;
+        .card-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 24px;
         }
 
-        .input-field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.4px;
+            color: var(--ink);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: var(--ink-2);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(255,255,255,.03);
+            font-size: 15px;
+            color: var(--ink);
+            font-family: inherit;
             outline: none;
+            transition: all 0.15s ease;
         }
 
-        .input-field.error {
-            border-color: #ef4444;
+        .form-input::placeholder {
+            color: var(--muted-2);
         }
 
-        .input-field.success {
-            border-color: #10b981;
+        .form-input:focus {
+            border-color: var(--red);
+            background: rgba(255,255,255,.06);
+            box-shadow: 0 0 0 3px rgba(209,75,92,.15);
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            transition: all 0.2s ease;
+        .form-input.error {
+            border-color: var(--coral);
+            background: rgba(255,122,101,.08);
         }
 
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+        .form-input.success {
+            border-color: var(--gold);
         }
 
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .input-wrapper {
+            position: relative;
         }
 
-        .password-strength {
+        .input-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            padding: 6px;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .input-toggle:hover {
+            color: var(--ink-2);
+        }
+
+        .form-error {
+            color: var(--coral);
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        /* Password strength */
+        .strength-bar-container {
             height: 4px;
+            background: var(--surface-2);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
             border-radius: 2px;
             transition: all 0.3s ease;
         }
 
+        .strength-text {
+            font-size: 11px;
+            margin-top: 6px;
+            color: var(--muted);
+        }
+
+        /* Requirements */
+        .requirements {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
         .requirement {
-            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted-2);
+            transition: color 0.2s ease;
         }
 
         .requirement.met {
-            color: #10b981;
+            color: var(--gold);
+        }
+
+        .requirement svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
         }
 
         .requirement.met svg {
-            color: #10b981;
+            opacity: 1;
+            color: var(--gold);
         }
 
-        .logo-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            border-radius: 16px;
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-deep) 100%);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px -5px rgba(59, 130, 246, 0.4);
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 24px -8px rgba(178,58,72,0.5);
+            margin-top: 20px;
         }
 
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 24px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            z-index: 1000;
-            transform: translateX(400px);
-            opacity: 0;
-            transition: all 0.3s ease;
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px -8px rgba(178,58,72,0.6);
         }
 
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .toast.success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .toast.error {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-
-        .loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -167,201 +345,289 @@
             to { transform: rotate(360deg); }
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
+        /* Footer */
+        .card-footer {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
+            text-align: center;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .card-footer p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
         }
 
-        .success-checkmark {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 50%;
+        .card-footer a {
+            color: var(--ink-2);
+            text-decoration: underline;
+        }
+
+        /* Success state */
+        .success-state {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-glow) 100%);
+            border-radius: 16px;
+            margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: scaleIn 0.5s ease forwards;
+            box-shadow: 0 12px 28px -8px rgba(212,160,90,0.5);
+            animation: scaleIn 0.4s ease;
         }
 
         @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
-        .password-toggle {
-            cursor: pointer;
-            color: #9ca3af;
-            transition: color 0.2s ease;
+        .success-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--ink);
         }
 
-        .password-toggle:hover {
-            color: #6b7280;
+        .success-title .name {
+            font-style: italic;
+            color: var(--red);
+        }
+
+        .success-text {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .success-email {
+            color: var(--ink-2);
+            font-weight: 500;
+        }
+
+        .success-redirect {
+            color: var(--muted-2);
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        .success-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--gold);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 40px -20px rgba(0,0,0,.7);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            border-color: rgba(255,122,101,.3);
+            color: var(--coral);
+        }
+
+        .toast.success {
+            border-color: rgba(212,160,90,.3);
+            color: var(--gold);
+        }
+
+        /* Login link */
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .login-link a {
+            color: var(--gold);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
+<body>
+    <!-- Background effects -->
+    <div class="blob" style="background:#B23A48;width:500px;height:500px;top:-200px;right:-100px"></div>
+    <div class="blob" style="background:#A07835;width:400px;height:400px;bottom:-150px;left:-150px;opacity:.22"></div>
+    <div class="grid-bg"></div>
+
+    <!-- Toast -->
     <div id="toast" class="toast"></div>
 
-    <div class="card w-full max-w-md p-8 fade-in">
-        <!-- Logo & Title -->
-        <div class="text-center mb-8">
-            <div class="flex justify-center mb-4">
-                <div class="logo-icon">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-                    </svg>
-                </div>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
             </div>
-            <h1 class="text-2xl font-bold text-gray-900 mb-2">Criar Conta</h1>
-            <p class="text-gray-500">USMLE Study Tracker</p>
+            <div class="logo-text">
+                <span class="logo-title">USMLE Daily Tracker</span>
+                <span class="logo-subtitle">Step 1</span>
+            </div>
         </div>
 
-        <!-- Registration Form -->
-        <form id="signupForm" class="space-y-5">
-            <!-- Email Field -->
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                </label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    class="input-field w-full px-4 py-3 rounded-xl text-gray-900"
-                    placeholder="seu@email.com"
-                    required
-                    autocomplete="email"
-                >
-                <p id="emailError" class="text-red-500 text-sm mt-1 hidden"></p>
-            </div>
+        <!-- Card -->
+        <div class="card">
+            <!-- Form -->
+            <form id="signupForm">
+                <div class="card-header">
+                    <h1 class="card-title">Crie sua conta</h1>
+                </div>
 
-            <!-- Password Field -->
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                    Senha
-                </label>
-                <div class="relative">
+                <!-- Email -->
+                <div class="form-group">
+                    <label class="form-label">E-mail</label>
                     <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="input-field w-full px-4 py-3 rounded-xl text-gray-900 pr-12"
-                        placeholder="Mínimo 8 caracteres"
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="voce@email.com"
+                        autocomplete="email"
                         required
-                        autocomplete="new-password"
                     >
-                    <button type="button" id="togglePassword" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2">
-                        <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                    </button>
+                    <p id="emailError" class="form-error"></p>
                 </div>
 
-                <!-- Password Strength Bar -->
-                <div class="mt-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div id="strengthBar" class="password-strength bg-gray-300" style="width: 0%"></div>
+                <!-- Password -->
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            class="form-input"
+                            placeholder="Mínimo 8 caracteres"
+                            autocomplete="new-password"
+                            required
+                            style="padding-right: 50px;"
+                        >
+                        <button type="button" id="togglePassword" class="input-toggle">mostrar</button>
+                    </div>
+
+                    <div class="strength-bar-container">
+                        <div id="strengthBar" class="strength-bar"></div>
+                    </div>
+                    <p id="strengthText" class="strength-text"></p>
+
+                    <div class="requirements">
+                        <div id="req-length" class="requirement">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Mínimo 8 caracteres</span>
+                        </div>
+                        <div id="req-uppercase" class="requirement">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Uma letra maiúscula</span>
+                        </div>
+                        <div id="req-lowercase" class="requirement">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Uma letra minúscula</span>
+                        </div>
+                        <div id="req-number" class="requirement">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Um número</span>
+                        </div>
+                    </div>
                 </div>
-                <p id="strengthText" class="text-xs text-gray-500 mt-1"></p>
 
-                <!-- Password Requirements -->
-                <div class="mt-3 space-y-1">
-                    <div id="req-length" class="requirement flex items-center gap-2 text-xs text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span>Mínimo 8 caracteres</span>
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label class="form-label">Confirmar senha</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            class="form-input"
+                            placeholder="Digite a senha novamente"
+                            autocomplete="new-password"
+                            required
+                            style="padding-right: 50px;"
+                        >
+                        <button type="button" id="toggleConfirm" class="input-toggle">mostrar</button>
                     </div>
-                    <div id="req-uppercase" class="requirement flex items-center gap-2 text-xs text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span>Uma letra maiúscula</span>
-                    </div>
-                    <div id="req-lowercase" class="requirement flex items-center gap-2 text-xs text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span>Uma letra minúscula</span>
-                    </div>
-                    <div id="req-number" class="requirement flex items-center gap-2 text-xs text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span>Um número</span>
-                    </div>
+                    <p id="confirmError" class="form-error"></p>
                 </div>
-            </div>
 
-            <!-- Confirm Password Field -->
-            <div>
-                <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
-                    Confirmar Senha
-                </label>
-                <div class="relative">
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        class="input-field w-full px-4 py-3 rounded-xl text-gray-900 pr-12"
-                        placeholder="Digite a senha novamente"
-                        required
-                        autocomplete="new-password"
-                    >
-                    <button type="button" id="toggleConfirmPassword" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                    </button>
+                <!-- Submit -->
+                <button type="submit" id="submitBtn" class="btn-primary" disabled>
+                    <span id="btnText">Criar conta</span>
+                    <div id="btnSpinner" class="spinner hidden"></div>
+                </button>
+
+                <div class="card-footer">
+                    <p>Ao criar conta você concorda com os <a href="#">Termos</a> e <a href="#">Privacidade</a>.</p>
                 </div>
-                <p id="confirmError" class="text-red-500 text-sm mt-1 hidden"></p>
-            </div>
+            </form>
 
-            <!-- Submit Button -->
-            <button
-                type="submit"
-                id="submitBtn"
-                class="btn-primary w-full py-3 px-4 rounded-xl text-white font-semibold flex items-center justify-center gap-2"
-                disabled
-            >
-                <span id="btnText">Criar Conta</span>
-                <div id="btnSpinner" class="loading-spinner hidden"></div>
-            </button>
-        </form>
-
-        <!-- Login Link -->
-        <div class="mt-6 text-center">
-            <p class="text-gray-500 text-sm">
-                Já tem uma conta?
-                <a href="https://drgmb.github.io/usmle-daily-study-tracker/" class="text-blue-600 font-medium hover:underline">
-                    Fazer login
+            <!-- Success State -->
+            <div id="successState" class="success-state hidden">
+                <div class="success-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 12 L9 17 L20 6" stroke="#110A09" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2 class="success-title">Bem-vindo!</h2>
+                <p class="success-text">
+                    Enviamos um link de confirmação para<br>
+                    <span id="successEmail" class="success-email"></span>
+                </p>
+                <p class="success-redirect">Redirecionando em <span id="countdown">5</span> segundos...</p>
+                <a href="https://drgmb.github.io/usmle-daily-study-tracker/" class="success-link">
+                    Ir para o app agora
                 </a>
-            </p>
+            </div>
         </div>
 
-        <!-- Success State (Hidden by default) -->
-        <div id="successState" class="hidden text-center py-8">
-            <div class="flex justify-center mb-6">
-                <div class="success-checkmark">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
-                </div>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">Conta Criada!</h2>
-            <p class="text-gray-500 mb-6">Verifique seu email para confirmar a conta.</p>
-            <p id="redirectText" class="text-sm text-gray-400">Redirecionando em <span id="countdown">5</span> segundos...</p>
-            <a
-                href="https://drgmb.github.io/usmle-daily-study-tracker/"
-                class="mt-4 inline-block text-blue-600 font-medium hover:underline"
-            >
-                Ir para o app agora
-            </a>
+        <!-- Login link -->
+        <div class="login-link">
+            Já tem uma conta? <a href="https://drgmb.github.io/usmle-daily-study-tracker/">Fazer login</a>
         </div>
     </div>
 
@@ -389,33 +655,24 @@
         const successState = document.getElementById('successState');
         const toast = document.getElementById('toast');
 
-        // Password requirements elements
-        const reqLength = document.getElementById('req-length');
-        const reqUppercase = document.getElementById('req-uppercase');
-        const reqLowercase = document.getElementById('req-lowercase');
-        const reqNumber = document.getElementById('req-number');
-
-        // Password visibility toggles
-        document.getElementById('togglePassword').addEventListener('click', () => {
-            togglePasswordVisibility(passwordInput, document.getElementById('eyeIcon'));
+        // Password toggles
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? 'ocultar' : 'mostrar';
         });
 
-        document.getElementById('toggleConfirmPassword').addEventListener('click', () => {
-            togglePasswordVisibility(confirmPasswordInput);
+        document.getElementById('toggleConfirm').addEventListener('click', function() {
+            const isPassword = confirmPasswordInput.type === 'password';
+            confirmPasswordInput.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? 'ocultar' : 'mostrar';
         });
 
-        function togglePasswordVisibility(input, icon) {
-            const type = input.type === 'password' ? 'text' : 'password';
-            input.type = type;
-        }
-
-        // Validate email format
+        // Validation functions
         function isValidEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
-        // Check password requirements
         function checkPasswordRequirements(password) {
             const requirements = {
                 length: password.length >= 8,
@@ -424,68 +681,51 @@
                 number: /[0-9]/.test(password)
             };
 
-            // Update requirement indicators
-            updateRequirement(reqLength, requirements.length);
-            updateRequirement(reqUppercase, requirements.uppercase);
-            updateRequirement(reqLowercase, requirements.lowercase);
-            updateRequirement(reqNumber, requirements.number);
+            updateRequirement('req-length', requirements.length);
+            updateRequirement('req-uppercase', requirements.uppercase);
+            updateRequirement('req-lowercase', requirements.lowercase);
+            updateRequirement('req-number', requirements.number);
 
             return requirements;
         }
 
-        function updateRequirement(element, isMet) {
-            if (isMet) {
-                element.classList.add('met');
+        function updateRequirement(id, met) {
+            const el = document.getElementById(id);
+            if (met) {
+                el.classList.add('met');
             } else {
-                element.classList.remove('met');
+                el.classList.remove('met');
             }
         }
 
-        // Calculate password strength
         function calculatePasswordStrength(password) {
             const requirements = checkPasswordRequirements(password);
             const metCount = Object.values(requirements).filter(Boolean).length;
 
-            let strength = 0;
-            let text = '';
-            let color = '';
+            const colors = {
+                0: '#6E624F',
+                1: '#FF7A65',
+                2: '#D4A05A',
+                3: '#D4A05A',
+                4: '#34C759'
+            };
 
-            if (password.length === 0) {
-                strength = 0;
-                text = '';
-                color = '#d1d5db';
-            } else if (metCount === 1) {
-                strength = 25;
-                text = 'Muito fraca';
-                color = '#ef4444';
-            } else if (metCount === 2) {
-                strength = 50;
-                text = 'Fraca';
-                color = '#f97316';
-            } else if (metCount === 3) {
-                strength = 75;
-                text = 'Boa';
-                color = '#eab308';
-            } else if (metCount === 4) {
-                strength = 100;
-                text = 'Forte';
-                color = '#10b981';
-            }
+            const texts = {
+                0: '',
+                1: 'Muito fraca',
+                2: 'Fraca',
+                3: 'Boa',
+                4: password.length >= 12 ? 'Muito forte' : 'Forte'
+            };
 
-            // Extra bonus for longer passwords
-            if (password.length >= 12 && metCount === 4) {
-                text = 'Muito forte';
-            }
-
-            strengthBar.style.width = strength + '%';
-            strengthBar.style.backgroundColor = color;
-            strengthText.textContent = text;
-            strengthText.style.color = color;
+            strengthBar.style.width = (metCount * 25) + '%';
+            strengthBar.style.backgroundColor = colors[metCount];
+            strengthText.textContent = texts[metCount];
+            strengthText.style.color = colors[metCount];
 
             return metCount === 4;
         }
 
-        // Validate form
         function validateForm() {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -496,48 +736,46 @@
             const allRequirementsMet = Object.values(requirements).every(Boolean);
             const passwordsMatch = password === confirmPassword && password.length > 0;
 
-            // Update email field state
+            // Email validation
             if (email.length > 0) {
                 if (isEmailValid) {
                     emailInput.classList.remove('error');
                     emailInput.classList.add('success');
-                    emailError.classList.add('hidden');
+                    emailError.classList.remove('show');
                 } else {
                     emailInput.classList.remove('success');
                     emailInput.classList.add('error');
-                    emailError.textContent = 'Email inválido';
-                    emailError.classList.remove('hidden');
+                    emailError.textContent = 'E-mail inválido';
+                    emailError.classList.add('show');
                 }
             } else {
                 emailInput.classList.remove('error', 'success');
-                emailError.classList.add('hidden');
+                emailError.classList.remove('show');
             }
 
-            // Update confirm password field state
+            // Confirm password validation
             if (confirmPassword.length > 0) {
                 if (passwordsMatch) {
                     confirmPasswordInput.classList.remove('error');
                     confirmPasswordInput.classList.add('success');
-                    confirmError.classList.add('hidden');
+                    confirmError.classList.remove('show');
                 } else {
                     confirmPasswordInput.classList.remove('success');
                     confirmPasswordInput.classList.add('error');
                     confirmError.textContent = 'As senhas não coincidem';
-                    confirmError.classList.remove('hidden');
+                    confirmError.classList.add('show');
                 }
             } else {
                 confirmPasswordInput.classList.remove('error', 'success');
-                confirmError.classList.add('hidden');
+                confirmError.classList.remove('show');
             }
 
-            // Enable/disable submit button
             const isValid = isEmailValid && allRequirementsMet && passwordsMatch;
             submitBtn.disabled = !isValid;
 
             return isValid;
         }
 
-        // Show toast notification
         function showToast(message, type = 'success') {
             toast.textContent = message;
             toast.className = `toast ${type}`;
@@ -548,7 +786,6 @@
             }, 5000);
         }
 
-        // Handle form submission
         async function handleSignup(e) {
             e.preventDefault();
 
@@ -557,7 +794,6 @@
             const email = emailInput.value.trim();
             const password = passwordInput.value;
 
-            // Show loading state
             submitBtn.disabled = true;
             btnText.textContent = 'Criando conta...';
             btnSpinner.classList.remove('hidden');
@@ -571,25 +807,19 @@
                     }
                 });
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
-                // Check if email confirmation is required
                 if (data.user && data.user.identities && data.user.identities.length === 0) {
-                    // User already exists
                     showToast('Este email já está cadastrado. Tente fazer login.', 'error');
                     resetButton();
                     return;
                 }
 
-                // Success! Show success state
+                // Success
                 form.classList.add('hidden');
-                document.querySelector('.text-center.mb-8').classList.add('hidden');
-                document.querySelector('.mt-6.text-center').classList.add('hidden');
+                document.getElementById('successEmail').textContent = email;
                 successState.classList.remove('hidden');
 
-                // Start countdown
                 let seconds = 5;
                 const countdownEl = document.getElementById('countdown');
 
@@ -627,7 +857,7 @@
 
         function resetButton() {
             submitBtn.disabled = false;
-            btnText.textContent = 'Criar Conta';
+            btnText.textContent = 'Criar conta';
             btnSpinner.classList.add('hidden');
             validateForm();
         }
