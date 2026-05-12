@@ -17,7 +17,7 @@
       This page requires JavaScript to display.
     </div>
   </noscript>
-</head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head>
 <body>
   <div id="__bundler_thumbnail">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
@@ -182,3 +182,78 @@ document.addEventListener('DOMContentLoaded', async function() {
   </script>
 </body>
 </html>
+<script>
+// Supabase Integration for USMLE Daily Tracker Signup
+(function() {
+    const SUPABASE_URL = 'https://wdkotckjvkctxvaewfyw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka290Y2tqdmtjdHh2YWV3Znl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwODIxOTYsImV4cCI6MjA3OTY1ODE5Nn0.BQf0O1qmJSH0AHjwIDDSKTbU2LBaQtIpTkBEjfCzg7Y';
+    const REDIRECT_URL = 'https://drgmb.github.io/usmle-daily-study-tracker/';
+
+    // Wait for Supabase to load
+    function initSupabase() {
+        if (typeof supabase === 'undefined') {
+            setTimeout(initSupabase, 100);
+            return;
+        }
+
+        const authClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        window.__supabaseAuth = authClient;
+
+        // Override form submission
+        const originalSubmit = window.__originalFormSubmit;
+        
+        // Intercept form submissions
+        document.addEventListener('submit', async function(e) {
+            const form = e.target;
+            if (form.id === 'cadastro' || form.closest('#cadastro')) {
+                e.preventDefault();
+                
+                const emailInput = form.querySelector('input[type="email"]');
+                const passwordInput = form.querySelector('input[type="password"]');
+                const nameInput = form.querySelector('input[placeholder*="Nome"], input[placeholder*="Dr."]');
+                
+                if (!emailInput || !passwordInput) {
+                    console.error('Form inputs not found');
+                    return;
+                }
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                const name = nameInput ? nameInput.value.trim() : '';
+
+                try {
+                    const { data, error } = await authClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            emailRedirectTo: REDIRECT_URL,
+                            data: { full_name: name }
+                        }
+                    });
+
+                    if (error) throw error;
+
+                    if (data.user && data.user.identities && data.user.identities.length === 0) {
+                        alert('Este email já está cadastrado. Tente fazer login.');
+                        return;
+                    }
+
+                    // Success - the React component should handle the UI update
+                    console.log('Signup successful:', data);
+                    
+                } catch (error) {
+                    console.error('Signup error:', error);
+                    alert('Erro ao criar conta: ' + (error.message || 'Tente novamente.'));
+                }
+            }
+        }, true);
+    }
+
+    // Start initialization
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSupabase);
+    } else {
+        initSupabase();
+    }
+})();
+</script>
